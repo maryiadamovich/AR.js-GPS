@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    <script>
+        let userLocation = null;
+        
+        navigator.geolocation.getCurrentPosition(function (position) {
+            userLocation = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            };
+            console.log("Latitude: " + userLocation.latitude + ", Longitude: " + userLocation.longitude);
+            
+            const box = document.querySelector('a-box');
+            if (box) {
+                box.setAttribute('gps-entity-place', userLocation);
+            }
+        }, function(error) {
+            console.error("Error getting geolocation:", error);
+        });
+    </script>
+</head>
+
+<body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs="sourceType: webcam; trackingMethod: best; location: true;">
+        
+        <a-box position="0 0.5 0" rotation="0 45 0" color="blue"></a-box>
+
+        <a-entity camera></a-entity>
+    </a-scene>
+</body>
+
+</html>
