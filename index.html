@@ -8,15 +8,59 @@
 
 <body style="margin: 0; overflow: hidden;">
     <a-scene embedded arjs="sourceType: webcam; trackingMethod: best; location: true;">
-        <a-box 
-            position="0 0.5 0" 
-            rotation="0 45 0" 
-            color="blue" 
-            scale="1 1 1"
-            gps-entity-place="latitude: 56.8705622; longitude: 14.8207507;">
+        <a-box position="0 0.5 0" rotation="0 45 0" color="blue" scale="2 2 2"
+            gps-entity-place="latitude: 56.870468; longitude: 14.821054;">
         </a-box>
         <a-entity camera></a-entity>
     </a-scene>
+
+    <script>
+        // Заданные координаты (например, для куба)
+        const targetLatitude = 56.870468;
+        const targetLongitude = 14.821054;
+
+        // Функция для вычисления расстояния между двумя координатами (формула Haversine)
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371000; // Радиус Земли в метрах
+            const φ1 = toRadians(lat1);
+            const φ2 = toRadians(lat2);
+            const Δφ = toRadians(lat2 - lat1);
+            const Δλ = toRadians(lon2 - lon1);
+
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            return R * c;  // Возвращаем расстояние в метрах
+        }
+
+        // Преобразуем градусы в радианы
+        function toRadians(degrees) {
+            return degrees * Math.PI / 180;
+        }
+
+        // Функция для проверки расстояния и отображения куба
+        function checkDistance() {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                const currentLatitude = position.coords.latitude;
+                const currentLongitude = position.coords.longitude;
+
+                // Вычисление расстояния между текущими координатами и заданными
+                const distance = haversine(currentLatitude, currentLongitude, targetLatitude, targetLongitude);
+
+                // Если расстояние меньше или равно 5 метрам, показываем куб
+                if (distance <= 100) {
+                    document.getElementById('cube').setAttribute('visible', 'true');
+                } else {
+                    document.getElementById('cube').setAttribute('visible', 'false');
+                }
+            });
+        }
+
+        // Проверяем расстояние каждую секунду
+        setInterval(checkDistance, 1000);
+    </script>
 </body>
 
 </html>
